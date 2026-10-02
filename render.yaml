@@ -8,8 +8,8 @@ services:
     env: node
     plan: free
     region: oregon
-    buildCommand: npm install && npm run build --prefix client && npm install --prefix server && npm run build --prefix server
-    startCommand: npm start --prefix server
+    buildCommand: npm run install:all && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
