@@ -10,7 +10,6 @@ import {
   VolumeX,
   Volume1,
   Maximize2,
-  Sparkles,
   Tv,
 } from 'lucide-react';
 import { formatTime } from '../utils/time';
@@ -117,24 +116,24 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
   const progressPercent = duration > 0 ? (sliderValue / duration) * 100 : 0;
 
   return (
-    <div className="relative glass-panel p-4 rounded-2xl flex flex-col gap-3.5 shadow-2xl border border-white/10 transition-all select-none">
+    <div className="card p-3 sm:p-4 flex flex-col gap-2.5 sm:gap-3 select-none">
       {/* Progress Bar & Timestamps */}
-      <div className="flex items-center gap-3 w-full">
-        <span className="text-xs font-mono font-semibold text-zinc-300 min-w-[50px] text-right">
+      <div className="flex items-center gap-2 sm:gap-3 w-full">
+        <span className="text-[11px] sm:text-xs font-mono font-medium text-zinc-300 min-w-[42px] sm:min-w-[48px] text-right">
           {formatTime(isSeekingLocally ? sliderValue : currentTime)}
         </span>
 
-        {/* Custom Progress Bar with Hover Tooltip */}
+        {/* Custom Scrubber Track */}
         <div
           ref={progressBarRef}
           onMouseMove={handleProgressMouseMove}
           onMouseLeave={() => setHoverTime(null)}
-          className="relative flex-1 h-5 flex items-center group cursor-pointer"
+          className="relative flex-1 h-4 flex items-center group cursor-pointer"
         >
           {/* Tooltip on Hover */}
           {hoverTime !== null && isController && (
             <div
-              className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-md bg-zinc-900 border border-white/20 text-[10px] font-mono font-bold text-white shadow-lg pointer-events-none z-30"
+              className="absolute -top-7 -translate-x-1/2 px-1.5 py-0.5 rounded bg-zinc-900 border border-white/20 text-[10px] font-mono font-medium text-white pointer-events-none z-30"
               style={{ left: `${hoverPosition}px` }}
             >
               {formatTime(hoverTime)}
@@ -142,15 +141,15 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           )}
 
           {/* Track Background */}
-          <div className="w-full h-1.5 group-hover:h-2 bg-white/10 rounded-full overflow-hidden transition-all relative">
-            {/* Progress Fill */}
+          <div className="w-full h-1 group-hover:h-1.5 bg-white/10 rounded-full overflow-hidden transition-all relative">
+            {/* Progress Fill (Solid clean accent, no tacky rainbow gradient) */}
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 rounded-full transition-all"
+              className="h-full bg-indigo-500 rounded-full transition-all"
               style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
             />
           </div>
 
-          {/* Actual range input overlay for accessibility and smooth dragging */}
+          {/* Native range input overlay */}
           <input
             type="range"
             min={0}
@@ -166,73 +165,76 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           />
         </div>
 
-        <span className="text-xs font-mono font-semibold text-zinc-400 min-w-[50px]">
+        <span className="text-[11px] sm:text-xs font-mono font-medium text-zinc-400 min-w-[42px] sm:min-w-[48px]">
           {formatTime(duration)}
         </span>
       </div>
 
       {/* Control Buttons Bar */}
-      <div className="flex items-center justify-between pt-1">
-        {/* Left: Playback buttons */}
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 pt-0.5">
+        {/* Left: Playback & Volume */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Skip -10s */}
           <button
+            type="button"
             onClick={() => handleSkip(-10)}
             disabled={!isController}
             title={isController ? 'Rewind 10s' : 'Controls locked for viewers'}
-            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/5 hover:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            className="p-2 sm:p-2.5 rounded-md hover:bg-white/5 text-zinc-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <RotateCcw size={17} />
+            <RotateCcw size={16} />
           </button>
 
-          {/* Main Play / Pause Button with Glow Halo */}
+          {/* Primary Play / Pause Button (Clean solid brand button) */}
           <button
+            type="button"
             onClick={() => (isPlaying ? onPause() : onPlay())}
             disabled={!isController}
             title={
               !isController
                 ? 'Only Host or Moderators can control playback'
                 : isPlaying
-                ? 'Pause video for everyone'
-                : 'Play video for everyone'
+                ? 'Pause video'
+                : 'Play video'
             }
-            className={`relative flex items-center justify-center w-11 h-11 rounded-2xl font-bold transition-all shadow-lg active:scale-95 ${
+            className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-md font-medium transition-all ${
               isPlaying
-                ? 'bg-gradient-to-tr from-amber-500 to-orange-400 text-zinc-950 shadow-amber-500/30 hover:brightness-110'
-                : 'bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white shadow-indigo-500/35 hover:brightness-110'
-            } disabled:opacity-35 disabled:cursor-not-allowed disabled:transform-none`}
+                ? 'bg-zinc-800 text-amber-300 hover:bg-zinc-700'
+                : 'bg-indigo-600 text-white hover:bg-indigo-500'
+            } disabled:opacity-30 disabled:cursor-not-allowed`}
           >
             {isPlaying ? (
-              <Pause size={20} fill="currentColor" />
+              <Pause size={17} fill="currentColor" />
             ) : (
-              <Play size={20} fill="currentColor" className="ml-0.5" />
+              <Play size={17} fill="currentColor" className="ml-0.5" />
             )}
           </button>
 
           {/* Skip +10s */}
           <button
+            type="button"
             onClick={() => handleSkip(10)}
             disabled={!isController}
-            title={isController ? 'Fast Forward 10s' : 'Controls locked for viewers'}
-            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/5 hover:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+            title={isController ? 'Fast forward 10s' : 'Controls locked for viewers'}
+            className="p-2 sm:p-2.5 rounded-md hover:bg-white/5 text-zinc-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <RotateCw size={17} />
+            <RotateCw size={16} />
           </button>
 
           {/* Volume Control */}
-          <div className="hidden sm:flex items-center gap-1.5 ml-2 group">
+          <div className="flex items-center gap-1 ml-1 group">
             <button
               type="button"
               onClick={onToggleMute}
               title={isMuted ? 'Unmute' : 'Mute'}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="p-2 rounded-md text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
             >
               {isMuted || volume === 0 ? (
-                <VolumeX size={17} className="text-rose-400" />
+                <VolumeX size={16} className="text-rose-400" />
               ) : volume < 50 ? (
-                <Volume1 size={17} />
+                <Volume1 size={16} />
               ) : (
-                <Volume2 size={17} />
+                <Volume2 size={16} />
               )}
             </button>
             <input
@@ -242,33 +244,34 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
               value={isMuted ? 0 : volume}
               onChange={handleVolumeSlider}
               aria-label="Volume"
-              className="w-16 h-1 bg-white/15 rounded-lg accent-indigo-500 cursor-pointer opacity-70 group-hover:opacity-100 transition-opacity"
+              className="hidden sm:block w-14 sm:w-18 h-1 bg-white/15 rounded-full cursor-pointer accent-indigo-500"
             />
           </div>
         </div>
 
-        {/* Center: Viewer lock indicator or Controller status */}
+        {/* Center: Controller Status Pill */}
         <div className="hidden md:flex items-center">
           {!isController ? (
-            <div className="flex items-center gap-1.5 text-xs text-zinc-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-              <Lock size={12} className="text-zinc-400" />
-              <span>Viewer Mode &bull; Synchronized with Host</span>
+            <div className="flex items-center gap-1.5 text-xs text-zinc-400 bg-white/[0.04] px-2.5 py-1 rounded-full border border-white/5">
+              <Lock size={12} className="text-zinc-500" />
+              <span>Viewer &bull; Synced with Host</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-300 bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/25 shadow-sm">
-              <Sparkles size={13} className="text-indigo-400 animate-pulse" />
-              <span>Playback Master Active</span>
+            <div className="flex items-center gap-1.5 text-xs font-medium text-indigo-300 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+              <span>Host Master Active</span>
             </div>
           )}
         </div>
 
-        {/* Right: Resync & Fullscreen Actions */}
-        <div className="flex items-center gap-2">
+        {/* Right: Resync, Theater Mode, Fullscreen */}
+        <div className="flex items-center gap-1">
           {/* Resync Button */}
           <button
+            type="button"
             onClick={handleResyncClick}
-            title="Force re-sync with room time"
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white rounded-xl transition-all border border-white/10 active:scale-95"
+            title="Resync with party"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/5 rounded-md transition-colors border border-white/5"
           >
             <RefreshCw size={13} className={isResyncing ? 'animate-spin text-indigo-400' : ''} />
             <span className="hidden sm:inline">Resync</span>
@@ -277,25 +280,27 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           {/* Theater Mode Button */}
           {onToggleTheaterMode && (
             <button
+              type="button"
               onClick={onToggleTheaterMode}
-              title={isTheaterMode ? 'Exit Theater Mode' : 'Enter Theater Mode (Larger Video)'}
-              className={`p-2 rounded-xl border transition-all active:scale-95 hidden sm:flex items-center gap-1.5 text-xs font-semibold ${
+              title={isTheaterMode ? 'Exit Theater Mode' : 'Theater Mode'}
+              className={`p-2 rounded-md transition-colors hidden sm:flex items-center gap-1.5 text-xs font-medium ${
                 isTheaterMode
-                  ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/40 shadow-sm'
-                  : 'bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/10'
+                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <Tv size={15} />
-              <span className="hidden md:inline">{isTheaterMode ? 'Exit Theater' : 'Theater'}</span>
+              <span className="hidden lg:inline">{isTheaterMode ? 'Exit' : 'Theater'}</span>
             </button>
           )}
 
           {/* Fullscreen Button */}
           {onToggleFullscreen && (
             <button
+              type="button"
               onClick={onToggleFullscreen}
-              title="Toggle Fullscreen"
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition-all active:scale-95"
+              title="Fullscreen"
+              className="p-2 rounded-md text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
             >
               <Maximize2 size={16} />
             </button>

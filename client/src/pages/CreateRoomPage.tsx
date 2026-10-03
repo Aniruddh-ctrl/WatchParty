@@ -55,41 +55,36 @@ export const CreateRoomPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#06070b] text-white flex flex-col justify-center items-center px-4 py-12 selection:bg-indigo-500 selection:text-white relative overflow-hidden">
-      {/* Background glow orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[140px]"></div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-lg">
+    <div className="min-h-screen bg-[#090a0f] text-white flex flex-col justify-center items-center px-4 py-10">
+      <div className="w-full max-w-md">
         {/* Back Link */}
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors mb-5"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={14} />
           <span>Back to Home</span>
         </Link>
 
         {/* Card */}
-        <div className="glass-panel p-8 rounded-3xl shadow-2xl border border-white/15 backdrop-blur-2xl">
-          <div className="flex items-center gap-3.5 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <Tv size={24} className="text-white" />
+        <div className="card p-6 sm:p-7">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-md bg-indigo-600 flex items-center justify-center text-white shrink-0">
+              <Tv size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold tracking-tight text-white">Create a Watch Room</h2>
-              <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-semibold mt-0.5">
-                <Shield size={13} />
-                <span>You will be the Host with playback master controls</span>
+              <h2 className="text-base font-semibold text-white">Create a Watch Room</h2>
+              <div className="flex items-center gap-1 text-xs text-indigo-400 font-medium mt-0.5">
+                <Shield size={12} />
+                <span>You will have Host playback controls</span>
               </div>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Host Name */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
                 Your Display Name <span className="text-rose-400">*</span>
               </label>
               <input
@@ -102,13 +97,13 @@ export const CreateRoomPage: React.FC = () => {
                 required
                 maxLength={30}
                 placeholder="e.g. Captain"
-                className="w-full px-4 py-3 bg-zinc-900/90 border border-white/10 rounded-xl text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-all font-medium"
+                className="w-full px-3 py-2 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
 
             {/* Custom Room Code (Optional) */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
                 Custom Room Code <span className="text-zinc-500 font-normal">(Optional)</span>
               </label>
               <input
@@ -117,13 +112,13 @@ export const CreateRoomPage: React.FC = () => {
                 onChange={(e) => setCustomRoomId(e.target.value)}
                 placeholder="Leave blank for auto-generated code"
                 maxLength={20}
-                className="w-full px-4 py-3 bg-zinc-900/90 border border-white/10 rounded-xl text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                className="w-full px-3 py-2 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
               />
             </div>
 
             {/* Initial Video URL (Optional) */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
                 Initial YouTube Video <span className="text-zinc-500 font-normal">(Optional)</span>
               </label>
               <div className="relative">
@@ -135,22 +130,22 @@ export const CreateRoomPage: React.FC = () => {
                     if (error) setError(null);
                   }}
                   placeholder="https://www.youtube.com/watch?v=..."
-                  className="w-full pl-10 pr-4 py-3 bg-zinc-900/90 border border-white/10 rounded-xl text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
                 />
-                <Video size={16} className="absolute left-3.5 top-3.5 text-zinc-500" />
+                <Video size={14} className="absolute left-3 top-3 text-zinc-500" />
               </div>
 
               {/* Video Thumbnail Preview */}
               {previewId && (
-                <div className="mt-2.5 p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-3 animate-fade-in">
+                <div className="mt-2 p-2 rounded-md bg-white/[0.02] border border-white/10 flex items-center gap-2.5 animate-fade-in">
                   <img
                     src={`https://i.ytimg.com/vi/${previewId}/hqdefault.jpg`}
                     alt="Video preview"
-                    className="w-16 h-10 object-cover rounded-lg border border-white/10 shrink-0"
+                    className="w-14 h-9 object-cover rounded border border-white/10 shrink-0"
                   />
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                      <CheckCircle2 size={12} /> Valid Video Link
+                    <span className="text-[10px] font-medium text-emerald-400 flex items-center gap-1">
+                      <CheckCircle2 size={11} /> Valid Video Link
                     </span>
                     <p className="text-xs font-mono text-zinc-300 truncate">ID: {previewId}</p>
                   </div>
@@ -158,13 +153,11 @@ export const CreateRoomPage: React.FC = () => {
               )}
             </div>
 
-
-
-            {error && <p className="text-xs text-rose-400 font-semibold">{error}</p>}
+            {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
 
             <button
               type="submit"
-              className="w-full btn-primary py-3.5 text-sm shadow-xl"
+              className="w-full btn-primary py-2.5 text-sm font-medium mt-2"
             >
               Launch Watch Room
             </button>

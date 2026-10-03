@@ -8,8 +8,8 @@ import {
 } from '../types/room.js';
 import { generateRoomId, generateUserId } from '../utils/idGenerator.js';
 
-// Default starter video (YouTube Developer Showcase / Big Buck Bunny / Lofi)
-const DEFAULT_VIDEO_ID = 'jfKfPfyJRdk';
+// Default starter video (Official embed-safe YouTube API Developer Showcase)
+const DEFAULT_VIDEO_ID = 'M7lc1UVf-VE';
 
 export class RoomService {
   private rooms: Map<string, Room> = new Map();

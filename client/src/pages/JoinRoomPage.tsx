@@ -29,34 +29,30 @@ export const JoinRoomPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#06070b] text-white flex flex-col justify-center items-center px-4 py-12 selection:bg-indigo-500 selection:text-white relative overflow-hidden">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[480px] h-[480px] bg-indigo-600/20 rounded-full blur-[140px]"></div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-md">
+    <div className="min-h-screen bg-[#090a0f] text-white flex flex-col justify-center items-center px-4 py-10">
+      <div className="w-full max-w-sm">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-white transition-colors mb-5"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={14} />
           <span>Back to Home</span>
         </Link>
 
-        <div className="glass-panel p-8 rounded-3xl shadow-2xl border border-white/15 backdrop-blur-2xl">
-          <div className="flex items-center gap-3.5 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <Users size={24} className="text-white" />
+        <div className="card p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-md bg-indigo-600 flex items-center justify-center text-white shrink-0">
+              <Users size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold tracking-tight text-white">Join Watch Party</h2>
-              <p className="text-xs text-indigo-400 font-mono font-semibold">Room Code: {roomId}</p>
+              <h2 className="text-base font-semibold text-white">Join Watch Party</h2>
+              <p className="text-xs text-indigo-400 font-mono font-medium">Room: {roomId}</p>
             </div>
           </div>
 
-          <form onSubmit={handleJoin} className="space-y-5">
+          <form onSubmit={handleJoin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
+              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
                 Your Display Name
               </label>
               <input
@@ -70,17 +66,17 @@ export const JoinRoomPage: React.FC = () => {
                 maxLength={30}
                 placeholder="e.g. Charlie"
                 autoFocus
-                className="w-full px-4 py-3 bg-zinc-900/90 border border-white/10 rounded-xl text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-all font-medium"
+                className="w-full px-3 py-2 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
 
-            {error && <p className="text-xs text-rose-400 font-semibold">{error}</p>}
+            {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
 
             <button
               type="submit"
-              className="w-full btn-primary py-3.5 text-sm flex items-center justify-center gap-2 shadow-xl"
+              className="w-full btn-primary py-2.5 text-sm font-medium flex items-center justify-center gap-1.5"
             >
-              <LogIn size={18} />
+              <LogIn size={15} />
               <span>Enter Watch Room</span>
             </button>
           </form>

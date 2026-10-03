@@ -47,7 +47,7 @@ export const VideoChangeModal: React.FC<VideoChangeModalProps> = ({
     }
 
     if (videoId === currentVideoId) {
-      setError('This video is already loaded in the watch room.');
+      setError('This video is already currently playing.');
       return;
     }
 
@@ -59,34 +59,35 @@ export const VideoChangeModal: React.FC<VideoChangeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
       <div
-        className="relative w-full max-w-xl glass-panel-elevated p-6 shadow-2xl border border-white/15 overflow-hidden animate-scale-up"
+        className="relative w-full max-w-lg card p-6 shadow-xl overflow-hidden animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/25">
-              <Video size={20} />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-md bg-indigo-500/10 text-indigo-400">
+              <Video size={18} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">Stream New Video</h2>
-              <p className="text-xs text-zinc-400">Instantly switch video synchronized for all viewers</p>
+              <h2 className="text-sm font-semibold text-white">Stream New Video</h2>
+              <p className="text-xs text-zinc-400">Synchronized instantly for all viewers</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Input Form */}
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
+            <label className="block text-xs font-medium text-zinc-300 mb-1.5">
               YouTube Video URL or Video ID
             </label>
             <div className="relative">
@@ -99,43 +100,42 @@ export const VideoChangeModal: React.FC<VideoChangeModalProps> = ({
                 }}
                 placeholder="https://www.youtube.com/watch?v=... or ID"
                 autoFocus
-                className="w-full px-4 py-3 bg-zinc-900/90 border border-white/10 rounded-xl text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                className="w-full px-3 py-2.5 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
               />
               {previewId && (
-                <div className="absolute right-3 top-3 flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                  <CheckCircle2 size={13} />
+                <div className="absolute right-2.5 top-2.5 flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  <CheckCircle2 size={12} />
                   <span>Valid ID</span>
                 </div>
               )}
             </div>
             {error && (
-              <p className="mt-2 text-xs text-rose-400 flex items-center gap-1 font-medium">
-                <AlertCircle size={14} /> {error}
+              <p className="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                <AlertCircle size={13} /> {error}
               </p>
             )}
           </div>
 
           {/* Live Video Preview Box */}
           {previewId && (
-            <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-3.5 animate-fade-in">
+            <div className="p-2.5 rounded-md bg-white/[0.02] border border-white/10 flex items-center gap-3 animate-fade-in">
               <img
                 src={`https://i.ytimg.com/vi/${previewId}/hqdefault.jpg`}
                 alt="Video preview thumbnail"
-                className="w-24 h-14 object-cover rounded-xl border border-white/10 shadow-md shrink-0"
+                className="w-20 h-12 object-cover rounded border border-white/10 shrink-0"
               />
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
-                  Ready to broadcast
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
+                  Ready to stream
                 </span>
-                <p className="text-xs font-mono font-semibold text-zinc-200 truncate mt-0.5">
+                <p className="text-xs font-mono text-zinc-200 truncate mt-0.5">
                   ID: {previewId}
                 </p>
-                <p className="text-[11px] text-zinc-400">Click below to change video for everyone.</p>
               </div>
             </div>
           )}
 
-          <div className="flex justify-end gap-2.5 pt-1">
+          <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
               onClick={onClose}
@@ -146,9 +146,9 @@ export const VideoChangeModal: React.FC<VideoChangeModalProps> = ({
             <button
               type="submit"
               disabled={!previewId}
-              className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+              className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Broadcast Video
+              Stream Video
             </button>
           </div>
         </form>

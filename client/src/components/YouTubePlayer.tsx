@@ -87,7 +87,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
     const [isPlayerReady, setIsPlayerReady] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
 
-    // CRITICAL: Flag to prevent feedback loops
+    // Flag to prevent feedback loops
     const isProgrammaticActionRef = useRef<boolean>(false);
     const lastReportedTimeRef = useRef<number>(0);
     const currentLoadedVideoIdRef = useRef<string>(videoId);
@@ -234,14 +234,12 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
         try {
           playerRef.current = new window.YT.Player(elementId, {
             videoId,
-            host: 'https://www.youtube.com',
             playerVars: {
               autoplay: 0,
               controls: isController ? 1 : 0,
               disablekb: isController ? 0 : 1,
               modestbranding: 1,
               rel: 0,
-              origin: window.location.origin,
               playsinline: 1,
               enablejsapi: 1,
             },
@@ -304,7 +302,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
                   case 101:
                   case 150:
                     errorMsg =
-                      'The owner of this video restricts external embedding (Error 150/101). The host can paste another video link.';
+                      'The owner of this video restricts external embedding (Error 150/101). The host can choose another video.';
                     break;
                 }
                 setLoadError(errorMsg);
@@ -334,29 +332,26 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
     }, [isController]);
 
     return (
-      <div className="relative w-full h-full">
-        {/* Ambient Backlight Glow */}
-        <div className="ambient-glow" />
-
-        {/* Video Player Frame */}
-        <div className="relative w-full h-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center border border-white/10 group z-10">
+      <div className="relative w-full">
+        {/* Responsive Cinema Frame (Robust 16:9 aspect ratio, no distortion) */}
+        <div className="video-cinema-wrapper group">
           <div ref={containerRef} className="w-full h-full" />
 
           {/* Floating Emoji Reactions Overlay */}
           {reactions && reactions.length > 0 && (
-            <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 flex justify-end items-end p-6">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 flex justify-end items-end p-4 sm:p-6">
               {reactions.map((r, i) => (
                 <div
                   key={r.id}
                   className="animate-float-reaction flex flex-col items-center"
                   style={{
                     position: 'absolute',
-                    bottom: '24px',
-                    right: `${32 + (i % 6) * 48}px`,
+                    bottom: '20px',
+                    right: `${24 + (i % 6) * 44}px`,
                   }}
                 >
-                  <span className="text-4xl drop-shadow-lg select-none filter">{r.emoji}</span>
-                  <span className="text-[10px] font-bold text-white bg-black/75 px-2 py-0.5 rounded-full border border-white/10 shadow-lg mt-1 whitespace-nowrap">
+                  <span className="text-3xl sm:text-4xl drop-shadow select-none">{r.emoji}</span>
+                  <span className="text-[10px] font-medium text-white bg-zinc-950/80 px-2 py-0.5 rounded-full border border-white/10 mt-1 whitespace-nowrap">
                     {r.username}
                   </span>
                 </div>
@@ -366,18 +361,18 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
 
           {/* Loading overlay */}
           {!isPlayerReady && !loadError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/85 backdrop-blur-md z-10 transition-opacity">
-              <div className="w-12 h-12 border-3 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-3"></div>
-              <p className="text-zinc-200 font-semibold text-sm tracking-wide">Syncing YouTube Player...</p>
-              <span className="text-xs text-indigo-400 mt-1 font-mono">ID: {videoId}</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 z-10">
+              <div className="w-8 h-8 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-3"></div>
+              <p className="text-zinc-300 font-medium text-xs tracking-wide">Connecting YouTube Stream...</p>
+              <span className="text-[11px] text-zinc-500 mt-1 font-mono">{videoId}</span>
             </div>
           )}
 
           {/* Error overlay */}
           {loadError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/95 backdrop-blur-xl z-20 p-6 text-center animate-fade-in">
-              <div className="w-16 h-16 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-4 shadow-lg shadow-rose-500/10">
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/95 z-20 p-6 text-center animate-fade-in">
+              <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-3">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -386,17 +381,17 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Video Unavailable for Embedding</h3>
-              <p className="text-sm text-zinc-400 max-w-md mb-6 leading-relaxed">{loadError}</p>
+              <h3 className="text-base font-semibold text-white mb-1">Embedding Unavailable</h3>
+              <p className="text-xs text-zinc-400 max-w-sm mb-4 leading-relaxed">{loadError}</p>
 
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 {isController && onChangeVideoClick && (
                   <button
                     type="button"
                     onClick={onChangeVideoClick}
-                    className="btn-primary"
+                    className="btn-primary text-xs py-2 px-3.5"
                   >
-                    <span>Change Video Now</span>
+                    <span>Change Video</span>
                   </button>
                 )}
 
@@ -404,7 +399,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
                   href={`https://www.youtube.com/watch?v=${videoId}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn-secondary"
+                  className="btn-secondary text-xs py-2 px-3.5"
                 >
                   <span>Open on YouTube ↗</span>
                 </a>
