@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import { Tv } from 'lucide-react';
 
 // YouTube Player API types
 export interface YTPlayer {
@@ -86,6 +87,8 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
     const playerRef = useRef<YTPlayer | null>(null);
     const [isPlayerReady, setIsPlayerReady] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
+
+    const hasVideo = Boolean(videoId && videoId.trim().length > 0);
 
     // Flag to prevent feedback loops
     const isProgrammaticActionRef = useRef<boolean>(false);
@@ -200,7 +203,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
 
     // Handle videoId prop change smoothly via playerRef when player is already ready
     useEffect(() => {
-      if (playerRef.current && isPlayerReady && currentLoadedVideoIdRef.current !== videoId) {
+      if (hasVideo && playerRef.current && isPlayerReady && currentLoadedVideoIdRef.current !== videoId) {
         currentLoadedVideoIdRef.current = videoId;
         setLoadError(null);
         isProgrammaticActionRef.current = true;
@@ -214,10 +217,22 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
           }, 500);
         }
       }
-    }, [videoId, isPlayerReady]);
+    }, [videoId, hasVideo, isPlayerReady]);
 
-    // Initialize player once API is ready
+    // Initialize or destroy player based on whether videoId is present
     useEffect(() => {
+      if (!hasVideo) {
+        if (playerRef.current) {
+          try {
+            playerRef.current.destroy();
+          } catch {}
+          playerRef.current = null;
+        }
+        setIsPlayerReady(false);
+        setLoadError(null);
+        return;
+      }
+
       let isMounted = true;
       setLoadError(null);
       setIsPlayerReady(false);
@@ -329,13 +344,31 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
           playerRef.current = null;
         }
       };
-    }, [isController]);
+    }, [videoId, hasVideo, isController]);
 
     return (
       <div className="relative w-full">
         {/* Responsive Cinema Frame (Robust 16:9 aspect ratio, no distortion) */}
         <div className="video-cinema-wrapper group">
-          <div ref={containerRef} className="w-full h-full" />
+          {hasVideo ? (
+            <div ref={containerRef} className="w-full h-full" />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-[#090b11] select-none relative overflow-hidden">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3.5 shadow-lg">
+                <Tv size={32} className="text-indigo-400" />
+              </div>
+              <h2 className="text-base sm:text-xl font-bold text-white tracking-tight mb-1.5">
+                No Video Loaded
+              </h2>
+              <p className="text-xs sm:text-sm text-zinc-400 max-w-sm sm:max-w-md leading-relaxed mb-4">
+                Paste any YouTube video URL or ID into the box below to start synchronized playback with everyone in the room.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs text-zinc-300">
+                <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                <span>Ready to stream &bull; Paste URL below</span>
+              </div>
+            </div>
+          )}
 
           {/* Floating Emoji Reactions Overlay */}
           {reactions && reactions.length > 0 && (
@@ -360,7 +393,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
           )}
 
           {/* Loading overlay */}
-          {!isPlayerReady && !loadError && (
+          {hasVideo && !isPlayerReady && !loadError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 z-10">
               <div className="w-8 h-8 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-3"></div>
               <p className="text-zinc-300 font-medium text-xs tracking-wide">Connecting YouTube Stream...</p>
@@ -369,7 +402,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(
           )}
 
           {/* Error overlay */}
-          {loadError && (
+          {hasVideo && loadError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/95 z-20 p-6 text-center animate-fade-in">
               <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-3">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

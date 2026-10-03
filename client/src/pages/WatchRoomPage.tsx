@@ -3,7 +3,6 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import {
   Check,
   LogOut,
-  Video,
   Share2,
   Tv,
   AlertCircle,
@@ -12,6 +11,9 @@ import {
   Play,
   Clipboard,
   ExternalLink,
+  Copy,
+  X,
+  CheckCircle2,
 } from 'lucide-react';
 import { ConnectionBadge } from '../components/ConnectionBadge';
 import { ChatAndParticipantsPanel } from '../components/ChatAndParticipantsPanel';
@@ -32,8 +34,8 @@ export const WatchRoomPage: React.FC = () => {
   const initialVideoId = (location.state as { initialVideoId?: string })?.initialVideoId;
 
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const [isQuickPasteOpen, setIsQuickPasteOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedVideoLink, setCopiedVideoLink] = useState(false);
   const [mobileTab, setMobileTab] = useState<'player' | 'chat'>('player');
   const [isMuted, setIsMuted] = useState(false);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
@@ -122,27 +124,20 @@ export const WatchRoomPage: React.FC = () => {
       handleSendChat(`💡 Suggested video: https://www.youtube.com/watch?v=${extracted}`);
       setQuickUrl('');
       setQuickUrlError(null);
-      setIsQuickPasteOpen(false);
       return;
     }
 
     setQuickUrlError(null);
     handleChangeVideo(extracted);
     setQuickUrl('');
-    setIsQuickPasteOpen(false);
   };
 
   const handlePasteClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
       if (text) {
-        setQuickUrl(text);
-        const extracted = extractYouTubeVideoId(text.trim());
-        if (extracted && isController) {
-          handleChangeVideo(extracted);
-          setQuickUrl('');
-          setIsQuickPasteOpen(false);
-        }
+        setQuickUrl(text.trim());
+        if (quickUrlError) setQuickUrlError(null);
       }
     } catch {}
   };
@@ -351,98 +346,142 @@ export const WatchRoomPage: React.FC = () => {
               onToggleTheaterMode={() => setIsTheaterMode(!isTheaterMode)}
             />
 
-            {/* 3. Essential Video Information & Stream Actions Bar */}
-            <div className="card p-3 sm:p-3.5 flex flex-col gap-2.5">
-              <div className="flex flex-wrap items-center justify-between gap-2.5">
-                {/* Left: Video Details & YouTube Link */}
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                  <span className="text-xs font-medium text-zinc-300">Live Video:</span>
-                  <a
-                    href={`https://www.youtube.com/watch?v=${room.currentVideoId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    title="Open video on YouTube"
-                    className="font-mono text-xs text-indigo-300 hover:text-indigo-200 font-medium px-2 py-0.5 rounded bg-white/[0.04] border border-white/5 flex items-center gap-1 transition-colors truncate"
-                  >
-                    <span>{room.currentVideoId}</span>
-                    <ExternalLink size={11} className="shrink-0 text-zinc-400" />
-                  </a>
-                </div>
+            {/* 3. Dedicated YouTube Video URL Box (Always Visible, Substantial & Prominent) */}
+            <div className="card p-4 sm:p-5 flex flex-col gap-3.5 shadow-sm">
+              {/* Header row: Status of active video or instructions */}
+              <div className="flex flex-wrap items-center justify-between gap-2.5 pb-1">
+                {room.currentVideoId ? (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                    <span className="text-xs sm:text-sm font-semibold text-white">Playing Video:</span>
+                    <a
+                      href={`https://www.youtube.com/watch?v=${room.currentVideoId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Open in YouTube"
+                      className="font-mono text-xs sm:text-sm text-indigo-300 hover:text-indigo-200 font-medium px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 flex items-center gap-1.5 transition-colors truncate max-w-[240px] sm:max-w-md"
+                    >
+                      <span>https://www.youtube.com/watch?v={room.currentVideoId}</span>
+                      <ExternalLink size={12} className="shrink-0 text-zinc-400" />
+                    </a>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse shrink-0"></span>
+                    <span className="text-xs sm:text-sm font-semibold text-white">Paste YouTube Video URL</span>
+                    <span className="text-xs text-zinc-400 hidden sm:inline">&bull; Stream together in sync</span>
+                  </div>
+                )}
 
-                {/* Right: Quick Action Buttons */}
-                <div className="flex items-center gap-2">
+                {room.currentVideoId && (
                   <button
                     type="button"
-                    onClick={() => setIsQuickPasteOpen(!isQuickPasteOpen)}
-                    className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] rounded-md transition-colors border border-white/5 flex items-center gap-1.5 cursor-pointer"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`https://www.youtube.com/watch?v=${room.currentVideoId}`);
+                      setCopiedVideoLink(true);
+                      setTimeout(() => setCopiedVideoLink(false), 2000);
+                    }}
+                    className="px-2.5 py-1 text-xs font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-md transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
                   >
-                    <Video size={13} className="text-indigo-400" />
-                    <span>{isQuickPasteOpen ? 'Close URL' : 'Quick URL'}</span>
+                    {copiedVideoLink ? (
+                      <>
+                        <Check size={12} className="text-emerald-400" />
+                        <span className="text-emerald-400">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={12} />
+                        <span>Copy Link</span>
+                      </>
+                    )}
                   </button>
-
-                  {isController && (
-                    <button
-                      type="button"
-                      onClick={() => setIsVideoModalOpen(true)}
-                      className="btn-primary py-1 px-3 text-xs"
-                    >
-                      <span>Change Video</span>
-                    </button>
-                  )}
-                </div>
+                )}
               </div>
 
-              {/* Expandable Quick-Paste URL Input */}
-              {isQuickPasteOpen && (
-                <form
-                  onSubmit={handleQuickStream}
-                  className="pt-2 border-t border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 animate-fade-in"
-                >
-                  <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-md border border-white/10">
-                    <input
-                      type="text"
-                      value={quickUrl}
-                      onChange={(e) => {
-                        setQuickUrl(e.target.value);
-                        if (quickUrlError) setQuickUrlError(null);
-                      }}
-                      placeholder={
-                        isController
-                          ? 'Paste YouTube URL or ID to play immediately...'
-                          : 'Paste YouTube link to suggest to room...'
-                      }
-                      autoFocus
-                      className="w-full bg-transparent border-0 text-white placeholder-zinc-500 text-xs focus:outline-none font-mono"
-                    />
+              {/* Main Form: Prominent, comfortable YouTube URL Box */}
+              <form
+                onSubmit={handleQuickStream}
+                className="flex flex-col sm:flex-row items-stretch gap-2.5 sm:gap-3"
+              >
+                {/* Robust Input Container (h-12 on mobile, h-14 on desktop — comfortable, never thin or squashed!) */}
+                <div className="flex-1 relative flex items-center bg-[#0d1017] border border-white/15 hover:border-white/25 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 rounded-lg sm:rounded-xl transition-all h-12 sm:h-14 px-3 sm:px-4">
+                  {/* YouTube / Video Icon */}
+                  <div className="w-7 h-7 rounded-md bg-red-600/10 border border-red-500/20 text-red-400 flex items-center justify-center shrink-0 mr-2">
+                    <Play size={14} fill="currentColor" />
+                  </div>
+
+                  {/* The Actual URL Input */}
+                  <input
+                    type="text"
+                    value={quickUrl}
+                    onChange={(e) => {
+                      setQuickUrl(e.target.value);
+                      if (quickUrlError) setQuickUrlError(null);
+                    }}
+                    placeholder={
+                      isController
+                        ? 'Paste YouTube link or Video ID (e.g. https://www.youtube.com/watch?v=...)'
+                        : 'Paste YouTube link to suggest to the room...'
+                    }
+                    className="flex-1 bg-transparent border-0 text-white placeholder-zinc-500 text-xs sm:text-sm md:text-base focus:outline-none font-normal min-w-0"
+                  />
+
+                  {/* Action buttons inside the input bar: Clear + Paste */}
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                    {quickUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setQuickUrl('')}
+                        title="Clear input"
+                        className="p-1 rounded text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                      >
+                        <X size={15} />
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={handlePasteClipboard}
                       title="Paste from clipboard"
-                      className="p-1 rounded text-zinc-400 hover:text-white transition-colors shrink-0 cursor-pointer"
+                      className="px-2.5 sm:px-3 py-1.5 rounded-md bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                     >
                       <Clipboard size={13} />
+                      <span className="hidden xs:inline">Paste</span>
                     </button>
                   </div>
+                </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="submit"
-                      disabled={!quickUrl.trim()}
-                      className="btn-primary py-1.5 px-3 text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <Play size={12} fill="currentColor" />
-                      <span>{isController ? 'Stream Video' : 'Suggest'}</span>
-                    </button>
-                  </div>
-                </form>
-              )}
+                {/* Primary Stream Video Action Button (Matches h-12 / h-14 height!) */}
+                <button
+                  type="submit"
+                  disabled={!quickUrl.trim()}
+                  className="btn-primary h-12 sm:h-14 px-6 sm:px-8 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl shrink-0 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm transition-all"
+                >
+                  <Play size={15} fill="currentColor" />
+                  <span>{isController ? (room.currentVideoId ? 'Change Video' : 'Stream Video') : 'Suggest Video'}</span>
+                </button>
+              </form>
 
+              {/* Error Message */}
               {quickUrlError && (
-                <p className="text-xs text-rose-400 flex items-center gap-1">
-                  <AlertCircle size={12} /> {quickUrlError}
+                <p className="text-xs sm:text-sm text-rose-400 flex items-center gap-1.5 animate-fade-in">
+                  <AlertCircle size={14} className="shrink-0" />
+                  <span>{quickUrlError}</span>
                 </p>
               )}
+
+              {/* Subtitle / Helper information */}
+              <div className="flex flex-wrap items-center justify-between text-[11px] sm:text-xs text-zinc-400 gap-2 pt-0.5">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 size={13} className="text-indigo-400 shrink-0" />
+                  <span>Supports any YouTube video URL, youtu.be shortlink, or 11-char Video ID</span>
+                </span>
+                {isController ? (
+                  <span className="text-indigo-300 font-medium">Host/Moderator: Updates live for all viewers</span>
+                ) : (
+                  <span className="text-zinc-500">Only Host or Moderator can change stream</span>
+                )}
+              </div>
             </div>
           </div>
 

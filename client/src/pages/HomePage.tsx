@@ -7,14 +7,16 @@ import {
   ShieldCheck,
   Zap,
   MessageSquare,
-  Play,
+  Video,
 } from 'lucide-react';
+import { extractYouTubeVideoId } from '../utils/youtube';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState(
     localStorage.getItem('wp_last_username') || `Guest_${Math.floor(100 + Math.random() * 900)}`
   );
+  const [videoUrl, setVideoUrl] = useState('');
   const [roomCode, setRoomCode] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -23,19 +25,23 @@ export const HomePage: React.FC = () => {
       setError('Please enter a display name to continue.');
       return;
     }
+
+    let initialVideoId: string | undefined;
+    if (videoUrl.trim()) {
+      const extracted = extractYouTubeVideoId(videoUrl.trim());
+      if (!extracted) {
+        setError('The YouTube URL is invalid. Please provide a valid link or leave it blank.');
+        return;
+      }
+      initialVideoId = extracted;
+    }
+
     localStorage.setItem('wp_last_username', username.trim());
     const newRoomId = `party-${Math.random().toString(36).slice(2, 8)}`;
-    navigate(`/room/${newRoomId}`, { state: { username: username.trim() } });
-  };
-
-  const handleLaunchDemo = () => {
-    const nick = username.trim() || 'Host_Demo';
-    localStorage.setItem('wp_last_username', nick);
-    const demoRoomId = `party-${Math.random().toString(36).slice(2, 8)}`;
-    navigate(`/room/${demoRoomId}`, {
+    navigate(`/room/${newRoomId}`, {
       state: {
-        username: nick,
-        initialVideoId: 'M7lc1UVf-VE', // YouTube official embed-safe API demo
+        username: username.trim(),
+        initialVideoId,
       },
     });
   };
@@ -103,9 +109,9 @@ export const HomePage: React.FC = () => {
         </p>
 
         {/* Action Panel Card */}
-        <div className="mt-8 w-full max-w-sm card p-5 sm:p-6 text-left">
+        <div className="mt-8 w-full max-w-md card p-5 sm:p-6 text-left">
           {/* Display Name Input */}
-          <div className="mb-4">
+          <div className="mb-3.5">
             <label className="block text-xs font-medium text-zinc-300 mb-1.5">
               Your Display Name
             </label>
@@ -118,39 +124,50 @@ export const HomePage: React.FC = () => {
               }}
               placeholder="e.g. Alex"
               maxLength={25}
-              className="w-full px-3 py-2 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full h-11 px-3.5 bg-zinc-900 border border-white/15 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
             />
+          </div>
+
+          {/* Optional Video URL input upfront */}
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+              YouTube Video URL <span className="text-zinc-500 font-normal">(Optional)</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={videoUrl}
+                onChange={(e) => {
+                  setVideoUrl(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder="Paste YouTube URL (or add it later in the room)"
+                className="w-full h-11 pl-9 pr-3.5 bg-zinc-900 border border-white/15 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+              <Video size={15} className="absolute left-3 top-3.5 text-zinc-500" />
+            </div>
+            <p className="text-[11px] text-zinc-400 mt-1">
+              Leave blank if you prefer to paste a video after entering the party.
+            </p>
           </div>
 
           {error && <p className="text-xs text-rose-400 mb-3 font-medium">{error}</p>}
 
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={handleCreateRoom}
-              className="w-full btn-primary py-2.5 text-sm font-medium"
-            >
-              <Plus size={16} />
-              <span>Create Watch Room</span>
-            </button>
+          {/* Create Button */}
+          <button
+            type="button"
+            onClick={handleCreateRoom}
+            className="w-full btn-primary h-11 text-sm font-semibold flex items-center justify-center gap-2 rounded-lg"
+          >
+            <Plus size={16} />
+            <span>Create Watch Room</span>
+          </button>
 
-            {/* Quick Demo Party button */}
-            <button
-              type="button"
-              onClick={handleLaunchDemo}
-              className="w-full btn-secondary py-2 text-xs"
-            >
-              <Play size={12} className="text-indigo-400" />
-              <span>Quick Demo Party</span>
-            </button>
-          </div>
-
-          {/* Clean flex divider - cannot overlap */}
+          {/* Clean flex divider */}
           <div className="flex items-center gap-2.5 my-4">
             <div className="flex-1 h-px bg-white/10"></div>
             <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-              or join room
+              or join existing room
             </span>
             <div className="flex-1 h-px bg-white/10"></div>
           </div>
@@ -164,14 +181,14 @@ export const HomePage: React.FC = () => {
                 setRoomCode(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="Room code (e.g. party-abc1)"
-              className="flex-1 px-3 py-2 bg-zinc-900 border border-white/10 rounded-md text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+              placeholder="Enter room code or link (e.g. party-abc1)"
+              className="flex-1 h-11 px-3.5 bg-zinc-900 border border-white/15 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
             />
             <button
               type="submit"
-              className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md text-xs font-medium transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+              className="h-11 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center shrink-0 cursor-pointer"
             >
-              <ArrowRight size={15} />
+              <ArrowRight size={16} />
             </button>
           </form>
         </div>

@@ -8,8 +8,8 @@ import {
 } from '../types/room.js';
 import { generateRoomId, generateUserId } from '../utils/idGenerator.js';
 
-// Default starter video (Official embed-safe YouTube API Developer Showcase)
-const DEFAULT_VIDEO_ID = 'M7lc1UVf-VE';
+// No default demo video - rooms start empty until a URL is provided
+const DEFAULT_VIDEO_ID = '';
 
 export class RoomService {
   private rooms: Map<string, Room> = new Map();
